@@ -2,7 +2,7 @@ package socketyi
 
 import (
 	"net"
-	
+	"time"
 )
 
 type SocketYi struct {
@@ -22,13 +22,18 @@ func NewSocketYi(config *Config) (server *SocketYi){
 }
 
 func (so *SocketYi) Broadcast(data interface{}) {
-	
+	for _, v := range so.connections {
+		v.Send(data)
+	}
 }
 
 func (so *SocketYi) Handle(con *Connection) {
 	//conn.SetReadDeadline(time.Now().Add(2 * time.Minute)) // set 2 minutes timeout
     //defer con.Close()  // close connection before exit
-    con.Read()
+	go con.Read()
+	daytime := time.Now().String()
+	go con.Send([]byte(daytime))
+	go con.flush()
 }
 
 func (so *SocketYi) ListenAndServe(addr string) {
@@ -42,6 +47,6 @@ func (so *SocketYi) ListenAndServe(addr string) {
             continue
         }
         con := newConnection(so, conn)
-        go so.Handle(con)
+		go so.Handle(con)
     }
 }

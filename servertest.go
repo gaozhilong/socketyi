@@ -7,6 +7,6 @@ import (
 
 func main() {
 	so := socketyi.NewSocketYi(nil)
-	so.ListenAndServe(":1200")
+	so.ListenAndServe(":8000")
 }
 
